@@ -1,20 +1,27 @@
-FROM ubuntu:trusty
+# docker-subsonic-centos
+# subsonic on centos including transcoding support
 
-ENV LANG en_US.UTF-8
+FROM docker-ffmpeg-centos
+MAINTAINER Dave Snigier <dsnigier@gmail.com>
 
-RUN apt-get update -q && \
-    apt-get install -qy openjdk-7-jre-headless
+# installation
+RUN yum install -y java-1.7.0-openjdk-headless
 
-ADD http://downloads.sourceforge.net/project/subsonic/subsonic/5.0/subsonic-5.0.deb /tmp/subsonic.deb
-RUN dpkg -i /tmp/subsonic.deb && \
-    rm -rf /tmp/subsonic.deb
+ADD http://sourceforge.net/projects/subsonic/files/subsonic/5.0/subsonic-5.0.rpm/download /root/subsonic-5.0.rpm
 
-# Don't fork to the background
+RUN yum install --nogpgcheck /root/subsonic-5.0.rpm
+RUN rm /root/subsonic-5.0.rpm
+
+
+# run in the foreground
 RUN sed -i "s/ > \${LOG} 2>&1 &//" /usr/share/subsonic/subsonic.sh
-RUN sed -i "s/SUBSONIC_HTTPS_PORT=0/SUBSONIC_HTTPS_PORT=4443/" /usr/share/subsonic/subsonic.sh
 
-EXPOSE 4443
+# enable ssl
+# RUN sed -i "s/SUBSONIC_HTTPS_PORT=0/SUBSONIC_HTTPS_PORT=4443/" /usr/share/subsonic/subsonic.sh
 
-ADD start.sh /start.sh
+COPY startup.sh /startup.sh
+
+# Let's run it
+EXPOSE 4040
 
 CMD [ "/start.sh" ]
