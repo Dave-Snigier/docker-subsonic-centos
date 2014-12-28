@@ -1,7 +1,7 @@
 # docker-subsonic-centos
 # subsonic on centos including transcoding support
 
-FROM docker-ffmpeg-centos
+FROM lambdadriver/docker-ffmpeg-centos
 MAINTAINER Dave Snigier <dsnigier@gmail.com>
 
 # installation
